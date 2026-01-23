@@ -222,4 +222,4 @@ list = [8,6,6,4,-3,2,-4,7]
 
 summ = 0
 for i in range(1,len(list), 1):
-    summ=i+summ
+    if 
