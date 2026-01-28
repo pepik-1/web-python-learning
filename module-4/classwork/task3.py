@@ -3,7 +3,7 @@ def func(len,direct,symb):
     if direct == 'vertical':
         for i in range(0,len,1):
             print(symb)
-
+            
     elif direct == 'horizontal':
         line = symb * len
     print(line)

@@ -38,6 +38,6 @@
 
 # func_8(2,3,5,2,4,6,7,8,name="persona 5")
 
-def func_9(obj):
-    print(obj)
-func_9({'a':1})
+# def func_9(obj):
+#     print(obj)
+# func_9({'a':1})
