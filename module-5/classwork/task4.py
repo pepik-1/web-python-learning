@@ -5,3 +5,4 @@ for el in nums:
     result[n] = result.setdefault(n,0)+1
 for el in sorted(result):
     print(f"{el}:{result[el]}")
+    

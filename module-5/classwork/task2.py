@@ -1,6 +1,5 @@
 user = input()
 fruits = ['apple','banana','apple','applehmaple','appletytyt']
-count = fruits.count(user)
 count_2 = []
 for el in fruits:
     if user in el:

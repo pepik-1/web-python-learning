@@ -15,9 +15,9 @@ for el in friends:
 
 for el in en_friends:
     for friend in el:
-        if friend not in friends:
+        if friend not in friends and friend != user:
             result.append(friend)
         else:
             continue
-res = result.remove(user)
-print(res)
+        
+print(result)

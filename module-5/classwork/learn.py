@@ -22,11 +22,12 @@
 # set_a ^= set_b
 # print(set_a, result,result_op)
 
-my_set = {1,2,3}
-print(3 in my_set)
-print(len(my_set))
-print(sum(my_set))
-print(min(my_set))
-print(max(my_set))
-for el in my_set:
-    print(el)
+# my_set = {1,2,3}
+# print(3 in my_set)
+# print(len(my_set))
+# print(sum(my_set))
+# print(min(my_set))
+# print(max(my_set))
+# for el in my_set:
+#     print(el)
+
