@@ -30,3 +30,18 @@ for el in person_summ:
     if sum(person_summ[el])<8:
         less_eight.append(el)
 print(less_eight)
+
+
+poor_persons = {}
+for el in logs:
+    if el[0] not in poor_persons:
+        poor_persons[el[0]] = set()
+        poor_persons[el[0]].add(el[2])
+    else:
+        poor_persons[el[0]].add(el[2])
+print(poor_persons)
+result = []
+for el in poor_persons:
+    if sum(poor_persons[el])>= 12:
+        result.append(el)
+print(result)
