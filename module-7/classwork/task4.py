@@ -74,7 +74,12 @@ for el in requests:
         all_categories.add(el['category'])
 
 for el in requests:
-    if el['employee'] not in 
+    if el['employee'] not in employee_statuses:
+        employee_statuses[el['employee']] = {'approved':0,'rejected':0}
+    if el['status'] == 'rejected':
+        employee_statuses[el['employee']]['rejected'] +=1
+    if el['status'] == 'approved':
+        employee_statuses[el['employee']]['approved'] +=1
 
 
 for request in requests:
