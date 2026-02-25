@@ -38,7 +38,7 @@ for operation in operations:
     
 
 
-
+print(enter_exit)
 for el in enter_exit:
     if enter_exit[el][-1] == 'EXIT\n':
         bad_people.append(el)
