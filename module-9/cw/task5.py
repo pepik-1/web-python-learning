@@ -79,6 +79,7 @@ class AttendanceRegistry:
         # иначе добавить record в self.records
         
 
+        
     def load_rows(self, rows):
         # TODO:
         # пройти по rows
