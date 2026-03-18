@@ -143,50 +143,100 @@ class ReservationService:
         # TODO: если warehouse_id не существует -> WarehouseNotFoundError
         try:
             warehouse_id
+        except ValueError:
+            raise WarehouseNotFoundError('Not exists')
 
         # TODO: если quantity <= 0 -> QuantityError
+        if self.quantity <= 0:
+            raise QuantityError('wrong quantity')
+
+        return ReservationRequest(request_id,client,warehouse_id,sku,self.quantity)
         # TODO: вернуть объект ReservationRequest(...)
-        pass
+        
 
     def submit(self, row):
+        try:
+            self.parse_request(row)
+        
+            request = self.parse_request(row)
+
+            if request.request_id in self.processed_ids:
+                raise DuplicateRequestError('adwfawfa')
+            self.warehouses[request.warehouse_id].reserve(request)
+            self.processed_ids.add(request.request_id)
+            self.accepted.append(request)
+        except RecursionError as e:
+            self.errors.append({row,type(e).__name__,str(e)})
+
+            
         # TODO: внутри try вызвать parse_request(row)
         # TODO: если request.request_id уже в processed_ids -> DuplicateRequestError
         # TODO: затем warehouses[request.warehouse_id].reserve(request)
         # TODO: после успеха добавить request_id в processed_ids
         # TODO: добавить request в self.accepted
         # TODO: ReservationError сохранить в self.errors как (row, error_type, message)
-        pass
+        
 
     def load(self, rows):
+        for row in rows:
+            self.submit(row)
+    
         # TODO: вызвать submit(row) для каждой строки
-        pass
+        
 
     def client_totals(self):
+        totals = {}
+        for request in self.accepted:
+            totals[request.client] = totals.get(request.client,0)+ request.quantity
+        return totals
+    
         # TODO: собрать dict вида client -> total_reserved_quantity
-        pass
+        
 
     def top_client(self):
+        totals = self.client_totals()
+        return max(totals.items(),key=lambda x: x[1])
+
         # TODO: использовать client_totals()
         # TODO: вернуть tuple(client, total_quantity) с максимумом
-        pass
+        
 
     def lowest_stock_warehouse(self):
+        warehouse = min(self.warehouses.values(),key=lambda x: x.total_left())
         # TODO: найти склад с минимумом total_left()
         # TODO: вернуть tuple(warehouse_id, total_left)
-        pass
+        return warehouse.warehouse_id, warehouse.total_left()
 
     def warehouse_snapshot(self):
-        # TODO: собрать dict вида warehouse_id -> копия текущих остатков products
-        pass
+        return {
+            warehouse_id: dict(warehouse.products) for warehouse_id, warehouse in self.warehouses.items()
+        }
 
-    def find_request(self, request_id):
+        # TODO: собрать dict вида warehouse_id -> копия текущих остатков products
+        
+
+    def find_request(self, request_id) -> Optional[ReservationRequest]:
+        for request in self.accepted:
+            if request.request_id == request_id:
+                return request
+        return None
         # TODO: вернуть Optional[ReservationRequest]
         # TODO: пройтись по self.accepted и найти нужную заявку
         # TODO: если не найдено -> вернуть None
-        pass
+        
 
 
 service = ReservationService(stocks)
+
+service.load(rows)
+print(service.accepted)
+print(service.errors)
+print(service.warehouse_snapshot())
+print(service.client_totals())
+print(service.client_totals())
+print(service.top_client())
+print(service.lowest_stock_warehouse())
+print(service.find_request())
 
 # TODO: загрузить rows через service.load(rows)
 # TODO: вывести принятые заявки
