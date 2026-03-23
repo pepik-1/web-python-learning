@@ -9,9 +9,10 @@ lines = [
 
 
 def is_number(text):
-    if int(text):
+    try:
+        float(text)
         return True
-    else:
+    except ValueError:
         return False
     
     # TODO: вернуть True, если text можно считать числом (включая дроби и знак), иначе False
@@ -25,8 +26,10 @@ class Product:
         self._price = price
         self.category = category
 
-    def property_price(self):
+    @property
+    def price(self):
         return self._price
+    
     
     def set_price(self,value: float) -> bool:
         if isinstance(value(int,float)) and value >= 0:
@@ -36,16 +39,22 @@ class Product:
     
     @classmethod
     def from_line(cls,raw):
-        product_or_none = []
-        accept_names = {'Mouse','Keyboard','Cloud VM'}
-        id,name,price,category = raw.split(';')
-        try:
-            raw.split(';') == 4
-            name in accept_names
-        except ValueError as e:
-            product_or_none.append(name)
+        parts = raw.split(';')
+        if len(parts) != 4:
+            return None, "Wrong number of columns"
+        
+        id, name, price_str, category = parts
+        
+        if not is_number(price_str):
+            return None, f"Invalid price: {price_str}"
+        
+        price = float(price_str)
+        if price < 0:
+            return None, f"Negative price: {price}"
+            
+        return cls(id, name, price, category), None
 
-        # я не до конца понял что нужно сделать и какие причины куда добавлять
+
 
 
     # TODO: __init__(id, name, price, category)
@@ -56,43 +65,35 @@ class Product:
 
 
 class ProductRegistry:
-    # TODO: __init__ (products list + id set)
-    def __init__(self,products,list,id,set):
-        self.products = products
-        self.list = list
-        self.id = id
-        self.set = set
+    def __init__(self): 
+        self.products = []
+        self.ids = set()
 
-    def add(self,product:str) -> bool:
-        if product in self.products:
-            return False + "already exists"
-        return True + 'yeee'
+    def add(self, product) -> (bool, str):
+        if product.id in self.ids:
+            return False, "ID already exists"
+        self.products.append(product)
+        self.ids.add(product.id)
+        return True, "Success"
         
     def count(self):
-        count += 1
-        return count
+        return len(self.products)
     
     def all_products(self):
-        all = []
-        all.append(self.products)
-        return all
+        return self.products
     
-    def has_id(self,id):
-        if id != None:
-            return True
-        return False
+    def has_id(self, id):
+        return id in self.ids
     
-    def by_category(self,category):
-        categories = {'Periphery','Services'}
-        if category not in categories:
+    def by_category(self, category):
+    
+        return [p for p in self.products if p.category == category]
+    
+    def aug_price(self): 
+        if not self.products:
             return 0
-        count += 1
-        good = {category:count}
-        return good
-    
-    def aug_price(self):
         total = sum(p.price for p in self.products)
-        return total/len(self.products)
+        return total / len(self.products)
     
 
     # TODO: add(product) -> (bool, reason)
@@ -103,8 +104,30 @@ class ProductRegistry:
     # TODO: avg_price()
     
 
+registry = ProductRegistry()
+problems = []
+
+
+for line in lines:
+    product, reason = Product.from_line(line)
+    
+    if product is None:
+        problems.append((line,reason))
+        continue
+
+    success, add_reason = registry.add(product)
+    if not success:
+        
+        problems.append((line, add_reason))
+
 
 # TODO: создать registry и problems
 # TODO: пройти по lines, загрузить валидные товары
 # TODO: проблемные строки добавлять в problems как (line, reason)
 # TODO: вывести count, by_category, avg_price и problems
+
+
+print(registry.count())
+print(len(registry.by_category('Periphery')))
+print(registry.aug_price())
+print(problems)
