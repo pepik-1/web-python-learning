@@ -203,7 +203,7 @@ for row in rows:
     registry.add(row)
 
 print(registry.status_summary())
-
+print()
 # TODO: загрузить rows в registry
 # TODO: вывести все пропуска
 # TODO: вывести active_passes()

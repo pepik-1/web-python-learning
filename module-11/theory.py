@@ -27,3 +27,4 @@ with open('product.pkl','wb') as f:
 with open('product.pkl','rb') as f:
     loaded_product_pkl = pickle.load(f)
 print(loaded_product_pkl)
+

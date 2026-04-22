@@ -74,8 +74,7 @@ class InMemoryEmployeeRepository:
 @dataclass
 class EmployeeService:
     repo: EmployeeRepository
-
-
+    
     def active_names(self) -> list[str]:
         return [row['name'] for row in self.repo.get_all() if row['is_active']]
         # TODO: аннотировать результат как list[str]

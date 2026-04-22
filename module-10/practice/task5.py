@@ -65,7 +65,7 @@ def count_leaves(nodes: list[CommentNode]) -> int:
     # TODO 4: вернуть итог
     leave = CommentNode()
 
-    def node(node):
+    
         
 
 

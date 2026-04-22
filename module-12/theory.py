@@ -478,3 +478,5 @@ visitor = DiscountVisitor()
 items = [Book('book',1000),Course('course',5000)]
 for item in items:
     print(item.accept(visitor))
+
+    

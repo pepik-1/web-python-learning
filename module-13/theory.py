@@ -67,3 +67,4 @@ controller = CartController(CardModel(),ConsoleCartView())
 controller.add_product('banana')
 controller.add_product('coffe')
 controller.add_product('water')
+
