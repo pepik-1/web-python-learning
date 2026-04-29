@@ -15,9 +15,9 @@ class Recipe:
 class RecipeFactory:
     def get_standard_recipes() -> dict[int,Recipe]:
         return {
-            0: Recipe('pizza-1',['dough','cheese','tomatoes','mayonnaise','chiken']),
-            1: Recipe('pizza-2',['dough','cheese','tomatoes','ketchup','chiken']),
-            2: Recipe('pizza-3',['dough','cheese','tomatoes','chiken'])
+            0: Recipe('pizza-1',['dough','cheese','tomatoes','mayonnaise','chicken']),
+            1: Recipe('pizza-2',['dough','cheese','tomatoes','ketchup','chicken']),
+            2: Recipe('pizza-3',['dough','cheese','tomatoes','chicken'])
         }
 
 class PizzaBuilder:
@@ -107,6 +107,188 @@ def create_ingredients():
         'cheese': Ingredient('cheese','cheese',80,20),
         'tomatoes': Ingredient('tomatoes','tomatoes',20,5),
         'mayonnaise': Ingredient('mayonnaise','mayonnaise',50,10),
-        'chiken': Ingredient('chiken','chiken',666,228),
+        'chicken': Ingredient('chicken','chicken',666,228),
         'ketchup': Ingredient('ketchup','ketchup',15,3),
     }
+
+def create_stock():
+    return {
+        'dough':10,
+        'cheese':10,
+        'tomatoes': 10,
+        'mayonnaise':10,
+        'chicken': 10,
+        'ketchup': 10
+    }
+def get_topping():
+    return{ 
+        'tomatoes',
+        'mayonnaise',
+        'chicken',
+        'ketchup'
+    }
+
+def create_custom_recipe(inventory:Inventory) -> Recipe:
+    builder = PizzaBuilder()
+    print('own pizza creation')
+
+    for key in get_topping():
+        ingredient = inventory.ingredients[key]
+
+        choise = input(f'do you want to add {ingredient.name}') 
+
+        if choise == 'Yes':
+            builder.add_ingredient(ingredient.key)
+
+        return builder.build()
+
+class Inventory:
+    def __init__(self,ingredient: list[str, Ingredient],stock):
+        self.ingredients = ingredient
+        self.stock = stock
+
+    def has_enough(self,ingredienct_keys: list[str, Ingredient] ,quantity) -> bool:
+        for key in ingredienct_keys:
+            if self.stock.get(key,0) < quantity:
+                return False
+            return True
+
+    def reduce_stock(self,ingredienct_keys: list[str, Ingredient] ,quantity):
+        for key in ingredienct_keys:
+            self.stock[key] -= quantity
+
+    def show(self):
+        print('ingredients available')
+        for key,count in self.stock.items():
+            ingredient = self.ingredients[key]
+            print(f'{ingredient.name}:{count}')
+            
+
+class SalesReport:
+    def __init__(self):
+        self.profit = 0
+        self.revenue = 0
+        self.sold_count = 0
+    
+    def add_order(self,order:Order,ingredients: list[str, Ingredient]):
+
+        self.sold_count += sum(item.quantity for item in order.items)
+        self.revenue += order.total_price(ingredients)
+        self.profit += order.total_profit(ingredients)
+
+    def show(self):
+        print('summary')
+        print(f'pizzas sold: {self.sold_count}')
+        print(f'profit: {self.profit}')
+        print(f'revenue:{self.revenue}')
+
+def show_menu():
+    print('1.create order')
+    print('2. summary')
+    print('3. ingredients available')
+    print('4.Exit')
+
+def show_standart_recipes(recipes:dict[str,Recipe],ingredients:dict[str,Ingredient]):
+    print('default pizzas')
+    for number, recipe in recipes.items():
+        print(f'{number}. {recipe.name}')
+    price=sum(ingredients[key].price for key in recipe.ingredient_keys)
+    print(f'one item price: {price}')
+
+def choose_recipe(recipes:dict[str,Recipe],ingredients:dict[str,Ingredient],inventory:Inventory):
+
+
+
+    while True:
+        choise = input('choose a point:')
+
+        if choise == 0:
+            pass
+        else:
+            return recipes[int(choise)]
+        
+    
+        
+def choose_payment():
+    print('choose payment way:')
+    print('1 - cash')
+    print('2 - card')
+    
+    while True:
+        choice = input('choose:')
+        if choice == '1':
+            return CashPayment()
+        elif choice == '2':
+            return CardPayment()
+        
+
+        
+
+
+def create_order(
+        ingredients: dict[str,Ingredient],
+    inventory: Inventory,
+    report: SalesReport,
+    file_saver:FileOrderSaver
+):
+    recipes = RecipeFactory.get_standard_recipes()
+    items: list[OrderItem] = []
+    while True:
+        show_standart_recipes(recipes,ingredients)
+
+        recipe = choose_recipe(recipes,ingredients,inventory)
+        quantity = int(input('enter quantity:'))
+
+        if not inventory.has_enough(recipe.ingredient_keys,quantity):
+            print('run out of ingredients for an order')
+            return 
+        
+        items.append(OrderItem(recipe,quantity))
+
+        more = input('will you add one more pizza?')
+
+        if more == 'No':
+            break
+
+    payment_strategy, payment_type = choose_payment()
+
+    order = Order(items,payment_type)
+
+    for item in items:
+        inventory.reduce_stock(item.recipe.ingredient_keys,item.quantity)
+
+    amount = order.total_price(ingredients)
+    print(payment_strategy.pay(amount))
+
+    file_saver.save(order,ingredients)
+
+    report.add_order(order,ingredients)
+    
+
+
+
+def main():
+    
+    ingredients = create_ingredients()
+    stock = create_stock()
+
+    inventory = Inventory(ingredients,stock)
+    report = SalesReport()
+    file_saver = FileOrderSaver()
+
+    while True:
+        show_menu()
+
+        choice = input('select a point in a menu: ')
+
+        if choice == '1':
+            create_order(ingredients,inventory,report,file_saver)
+        elif choice == '2':
+            report.show()
+        elif choice == '3':
+            inventory.show()
+        elif choice == '4':
+            break
+
+main()
+
