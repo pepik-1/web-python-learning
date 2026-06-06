@@ -95,3 +95,4 @@ for person in staff:
     pass
 
 print("Общий фонд:", calculate_total_income(staff))
+
